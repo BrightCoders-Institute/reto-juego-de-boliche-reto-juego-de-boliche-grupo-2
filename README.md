@@ -16,4 +16,3 @@ Things you may want to cover:
 - How to Use the Project.
 - Credits
 - Badges
-- Status
