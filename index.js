@@ -1,33 +1,45 @@
 class bowlingGame {
   constructor() {
+    this.framesScores=[];
     this.finalScore = 0;
     this.throws = [];
 
   }
 
   tiros() {
-    const tiro = this.getScore(0, 10);
-    this.throws.push(tiro);
-    //save scores to a matrix
+    const firstThrow=this.getScore(0,10);
+    this.throws.push(firstThrow);
+    console.log(firstThrow);
+    const maxSecondThrow = 10-firstThrow;
+
+    const secondThrow = this.getScore(0,maxSecondThrow);
+    this.throws.push(secondThrow)
+    console.log(secondThrow)
+
   }
 
   calculatePunctuation() {
     let punctuation = 0;
     let numThrow = 0;
 
+
     for (let frame=0; frame < 10; frame++) {
 
       if (this.strike(numThrow)) { // in case it is a strike
         punctuation += 10 + this.throws[numThrow + 1] + this.throws[numThrow + 2];
         numThrow++;
+
       } else if (this.spare(numThrow)) { // in case it is a spare
         punctuation += 10 + this.throws[numThrow + 1];
         numThrow += 2;
+
       } else { // in case is none of the above( a normal score)
         punctuation += this.throws[numThrow] + this.throws[numThrow + 1];
         numThrow += 2;
 
+
       }
+     // this.framesScores.push(punctuation);
 
     }
 
@@ -56,11 +68,14 @@ class bowlingGame {
 const test = new bowlingGame();
 
 
-for (let tira = 0; tira < 20; tira++) {
+for (let frame = 0; frame < 10; frame++) {
+  console.log(`Frame N. `+frame)
   test.tiros();
+  // console.log(`You Score:`+test.firstThrow+secondThrow)
+
 }
 
-test.calculatePunctuation()
+test.calculatePunctuation();
 
 
 console.log(`Puntuación total: ${test.finalScore}`);
