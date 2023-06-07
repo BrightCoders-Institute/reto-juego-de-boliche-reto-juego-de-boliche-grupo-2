@@ -1,81 +1,106 @@
-class bowlingGame {
+class BowlingGame {
   constructor() {
-    this.framesScores=[];
-    this.finalScore = 0;
-    this.throws = [];
-
+      this.framesScores = [];
+      this.finalScore = 0;
+      this.throws = [];
   }
 
-  tiros() {
-    const firstThrow=this.getScore(0,10);
-    this.throws.push(firstThrow);
-    console.log(firstThrow);
-    const maxSecondThrow = 10-firstThrow;
+  tiros() {// get the 2 throws for frame
+      const firstThrow = this.getScore(0, 10);
+      this.throws.push(firstThrow);
 
-    const secondThrow = this.getScore(0,maxSecondThrow);
-    this.throws.push(secondThrow)
-    console.log(secondThrow)
+
+      const maxSecondThrow = 10 - firstThrow;
+      const secondThrow = this.getScore(0, maxSecondThrow);
+      this.throws.push(secondThrow);
 
   }
 
   calculatePunctuation() {
-    let punctuation = 0;
-    let numThrow = 0;
+      let punctuation = 0;
+      let numThrow = 0;
+
+      for (let frame = 1; frame <= 10; frame++) {
+          if (this.strike(numThrow)) { //strike
+              if (this.throws[numThrow + 1] === 0) {
+                  punctuation += 10 + this.throws[numThrow + 2] + this.throws[numThrow + 3];
+                  numThrow++;
+              } else {
+                  punctuation += 10 + this.throws[numThrow + 1] + this.throws[numThrow + 2];
+                  numThrow++;
+              }
 
 
-    for (let frame=0; frame < 10; frame++) {
+          } else if (this.spare(numThrow)) {//spare
+              punctuation += 10 + this.throws[numThrow + 2];
+              numThrow += 2;
+          } else { //normal
+              punctuation += this.throws[numThrow] + this.throws[numThrow + 1];
+              numThrow += 2;
+          }
 
-      if (this.strike(numThrow)) { // in case it is a strike
-        punctuation += 10 + this.throws[numThrow + 1] + this.throws[numThrow + 2];
-        numThrow++;
+          this.framesScores.push({
+              frame: frame - 1,
+              punctuation
+          });
+      }
 
-      } else if (this.spare(numThrow)) { // in case it is a spare
-        punctuation += 10 + this.throws[numThrow + 1];
-        numThrow += 2;
-
-      } else { // in case is none of the above( a normal score)
-        punctuation += this.throws[numThrow] + this.throws[numThrow + 1];
-        numThrow += 2;
+      if ( //For the extra frame and score
+          numThrow === 18 &&
+          (this.throws[18] === 10 || (this.throws[18] + this.throws[19]) === 10)
+      ) {
+          const extraScore = this.getScore(0, 10);
+          console.log('EXTRA SCORE:'+extraScore);
+          punctuation += extraScore;
+          this.framesScores[9].punctuation += extraScore;
 
 
       }
-     // this.framesScores.push(punctuation);
+      if ( //For the extra frame and score
+      numThrow === 19 &&
+      this.throws[19] === 10
+  ) {
+      const extraScore = this.getScore(0, 10);
+      console.log('EXTRA SCORE:'+extraScore);
+      punctuation += extraScore;
+      this.framesScores[9].punctuation += extraScore;
 
-    }
-
-    this.finalScore = punctuation;
 
   }
 
-  strike(numThrow) { //condition to get a strike
-    if (this.throws[numThrow] === 10) {
-      return true;
-    }
+
+
+      this.finalScore = punctuation;
   }
 
-  spare(numThrow) { //condition to get a spare
-    if (this.throws[numThrow] + this.throws[numThrow + 1] === 10) {
-      return true;
-    }
+  strike(numThrow) { //condition to be a strike
+      return this.throws[numThrow] === 10;
   }
-  getScore(min, max) { // get a random score from 0 to 10
-    return Math.floor(Math.random() * (max - min + 1)) + min;
 
+  spare(numThrow) {//condition to be a spare
+      return this.throws[numThrow] + this.throws[numThrow + 1] === 10;
+  }
+
+  getScore(min, max) { //get a random score 0-10
+      return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
 
-
-const test = new bowlingGame();
-
-
-for (let frame = 0; frame < 10; frame++) {
-  console.log(`Frame N. `+frame)
+const test = new BowlingGame();
+for (let frame = 0; frame < 20; frame++) { //get the 20 scores
   test.tiros();
-  // console.log(`You Score:`+test.firstThrow+secondThrow)
-
 }
 
 test.calculatePunctuation();
 
+const tableData = test.framesScores.map((frame, index) => ({ //generate the table
+  Frame: index + 1,
+  'Throw 1': test.throws[index * 2],
+  'Throw 2': test.throws[index * 2 + 1],
+  Punctuation: frame.punctuation,
+}));
 
-console.log(`Puntuación total: ${test.finalScore}`);
+
+console.table(tableData); //print the table
+
+console.log(`Puntuación total: ${test.finalScore}`); //final score
